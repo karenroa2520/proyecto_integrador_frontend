@@ -13,56 +13,56 @@
     <!-- VISTA 1: Registro de Usuarios -->
     <div id="vistaUsuarios" class="vista">
 
-        <div class="vista-header">
+        <div class="vistaHeader">
             <h1>Registro de Usuarios</h1>
-            <button class="btn" id="btnIrTareas">Ir a Tareas</button>
+            <a href="view/crearTareas.html" class="btn btnPrimary">Ir a Tareas</a>
         </div>
 
         <div>
-            <form id="formUsuario">
-                <div>
-                    <label for="documento">Documento</label>
-                    <input type="text" name="documento" id="documento" placeholder="Ingrese su documento">
+            <form id="formUsuario" class="ucForm">
+                <div class="ucFormGroup">
+                    <label for="documento" class="ucFormLabel">Documento</label>
+                    <input type="text" name="documento" id="documento" class="ucFormInput" placeholder="Ingrese su documento">
                 </div>
-                <div>
-                    <label for="nombre">Nombre</label>
-                    <input type="text" name="nombre" id="nombre" placeholder="Ingrese su nombre">
+                <div class="ucFormGroup">
+                    <label for="nombre" class="ucFormLabel">Nombre</label>
+                    <input type="text" name="nombre" id="nombre" class="ucFormInput" placeholder="Ingrese su nombre">
                 </div>
-                <div>
-                    <p>Genero</p>
+                <div class="ucFormGroup">
+                    <p class="ucFormLabel">Genero</p>
                     <div id="generos" class="generos"></div>
                 </div>
-                <div>
-                    <label for="ciudad">Ciudades</label>
-                    <select name="ciudad" id="ciudadId">
+                <div class="ucFormGroup">
+                    <label for="ciudad" class="ucFormLabel">Ciudades</label>
+                    <select name="ciudad" id="ciudadId" class="ucFormInput">
                     </select>
                 </div>
-                <div>
-                    <label for="correo">Correo</label>
-                    <input type="text" name="correo" id="correo" placeholder="Ingrese su correo">
+                <div class="ucFormGroup">
+                    <label for="correo" class="ucFormLabel">Correo</label>
+                    <input type="text" name="correo" id="correo" class="ucFormInput" placeholder="Ingrese su correo">
                 </div>
-                <div class="checkbox-line">
-                    <label for="terminos">¿Acepta las politicas de tratamientos de datos?</label>
+                <div class="ucFormGroup checkboxLine">
+                    <label for="terminos" class="ucFormLabel">¿Acepta las politicas de tratamientos de datos?</label>
                     <input type="checkbox" id="terminos">
                 </div>
-                <div>
-                    <button class="btn" id="btnEnviar">Enviar</button>
+                <div class="ucFormGroup">
+                    <button class="btn btnPrimary" id="btnEnviar">Enviar</button>
                 </div>
             </form>
         </div>
 
-        <div class="seccion-buscar">
+        <div class="seccionBuscar">
             <h2>Buscar Usuario</h2>
 
-            <div class="buscar-fila">
-                <input type="text" id="buscarDocumento" placeholder="Ingrese documento a buscar">
-                <button class="btn" id="btnBuscar">Buscar</button>
+            <div class="buscarFila">
+                <input type="text" id="buscarDocumento" class="formInput" placeholder="Ingrese documento a buscar">
+                <button class="btn btnPrimary" id="btnBuscar">Buscar</button>
             </div>
 
             <div id="resultadoBusqueda"></div>
         </div>
 
-        <div id="listaUsuarios" class="lista-usuarios"></div>
+        <div id="listaUsuarios" class="listaUsuarios"></div>
 
     </div>
     <script src="app.js" type="module"></script>

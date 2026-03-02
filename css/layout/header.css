@@ -13,7 +13,7 @@
     margin: 0 auto;
 }
 
-.header__title {
+.headerTitle {
     font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-primary);
@@ -21,13 +21,13 @@
     letter-spacing: -0.02em;
 }
 
-.header__subtitle {
+.headerSubtitle {
     font-size: var(--font-size-lg);
     color: var(--color-text-secondary);
     font-weight: var(--font-weight-normal);
 }
 
-.header__navegacion {
+.headerNavegacion {
     margin-top: 5px;
     height: 50px;
     display: flex;
@@ -38,7 +38,7 @@
     box-shadow: inset 0px 0px 5px var(--color-gray-400);
 }
 
-.navegacion__link {
+.navegacionLink {
     font-size: var(--font-size-lg);
     color: var(--color-primary);
     font-weight: var(--font-weight-bold);
@@ -46,6 +46,6 @@
 }
 
 
-.navegacion__link:hover {
+.navegacionLink:hover {
     color: var(--color-primary-dark);
 }

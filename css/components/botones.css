@@ -21,28 +21,38 @@
     white-space: nowrap;
 }
 
-.btn--primary {
+/* Estilos específicos para enlaces que parecen botones */
+a.btn {
+    text-align: center;
+    min-width: fit-content;
+}
+
+a.btn:hover {
+    text-decoration: none;
+}
+
+.btnPrimary {
     background-color: var(--color-primary);
     color: white;
     box-shadow: var(--shadow-sm);
 }
 
-.btn--primary:hover {
+.btnPrimary:hover {
     background-color: var(--color-primary-dark);
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);
 }
 
-.btn--primary:active {
+.btnPrimary:active {
     transform: translateY(0);
     box-shadow: var(--shadow-sm);
 }
 
-.btn--primary:focus-visible {
+.btnPrimary:focus-visible {
     box-shadow: 0 0 0 3px var(--color-primary-lighter);
 }
 
-.btn__icon {
+.btnIcon {
     font-size: var(--font-size-lg);
 }
 
@@ -50,23 +60,23 @@
    VARIANTES DE BOTÓN ADICIONALES
    ============================================ */
 
-.btn--outline {
+.btnOutline {
     background-color: var(--color-surface);
     border: 1px solid var(--color-gray-700);
     color: var(--color-gray-700);
 }
 
-.btn--danger {
+.btnDanger {
     background-color: var(--color-error);
     border: 1px solid var(--color-error);
     color: white;
 }
 
-.btn--danger:hover {
+.btnDanger:hover {
     background-color: #dc2626;
 }
 
-.btn--sm {
+.btnSm {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-sm);
 }

@@ -9,7 +9,7 @@
    FORMULARIO
    ============================================ */
 
-.uc-form {
+.ucForm {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -18,20 +18,20 @@
   margin: var(--spacing-xl) auto 0;
 }
 
-.uc-form__group {
+.ucFormGroup {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
 }
 
-.uc-form__label {
+.ucFormLabel {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
   cursor: pointer;
 }
 
-.uc-form__input {
+.ucFormInput {
   width: 100%;
   padding: var(--spacing-md);
   font-size: var(--font-size-base);
@@ -45,16 +45,16 @@
   line-height: 1.5;
 }
 
-.uc-form__input:focus {
+.ucFormInput:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-lighter);
 }
 
-.uc-form__input::placeholder {
+.ucFormInput::placeholder {
   color: var(--color-gray-400);
 }
 
-.uc-input--error {
+.ucInputError {
   border: 2px solid var(--color-error) !important;
 }
 
@@ -79,7 +79,7 @@
   align-items: center;
 }
 
-.checkbox-line {
+.checkboxLine {
   display: flex;
   flex-direction: row;
   align-items: center;

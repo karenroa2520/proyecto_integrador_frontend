@@ -1,13 +1,13 @@
 export const armarCardUsuario = (usuario, ciudadesData, generosData) => {
   const card = document.createElement('div');
-  card.classList.add('card-usuario');
+  card.classList.add('cardUsuario');
   card.setAttribute('data-id', usuario.id);
 
   const ciudad = ciudadesData.find(function (c) { return c.id == usuario.ciudad_id; });
   const genero = generosData.find(function (g) { return g.id == usuario.genero_id; });
 
   const cardInfo = document.createElement('div');
-  cardInfo.classList.add('card-info');
+  cardInfo.classList.add('cardInfo');
 
   const crearParrafo = (label, valor) => {
     const p = document.createElement('p');
@@ -26,15 +26,15 @@ export const armarCardUsuario = (usuario, ciudadesData, generosData) => {
   );
 
   const cardAcciones = document.createElement('div');
-  cardAcciones.classList.add('card-acciones');
+  cardAcciones.classList.add('cardAcciones');
 
   const btnEditar = document.createElement('button');
-  btnEditar.classList.add('btn', 'btn-editar-usuario');
+  btnEditar.classList.add('btn', 'btnEditarUsuario');
   btnEditar.setAttribute('data-id', usuario.id);
   btnEditar.textContent = 'Editar';
 
   const btnEliminar = document.createElement('button');
-  btnEliminar.classList.add('btn', 'btn-eliminar-usuario');
+  btnEliminar.classList.add('btn', 'btnEliminarUsuario');
   btnEliminar.setAttribute('data-id', usuario.id);
   btnEliminar.textContent = 'Eliminar';
 

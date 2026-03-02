@@ -1,10 +1,10 @@
 export const armarCardTarea = (tarea) => {
   const card = document.createElement('div');
-  card.classList.add('card-tarea');
+  card.classList.add('cardTarea');
   card.setAttribute('data-id', tarea.id);
 
   const tareaInfo = document.createElement('div');
-  tareaInfo.classList.add('tarea-info');
+  tareaInfo.classList.add('tareaInfo');
 
   const crearParrafo = (label, valor, spanClass) => {
     const p = document.createElement('p');
@@ -25,20 +25,20 @@ export const armarCardTarea = (tarea) => {
 
   tareaInfo.append(
     crearParrafo('Documento', tarea.documento_usuario),
-    crearParrafo('Titulo', tarea.titulo, 'tarea-titulo'),
-    crearParrafo('Descripcion', tarea.descripcion, 'tarea-descripcion')
+    crearParrafo('Titulo', tarea.titulo, 'tareaTitulo'),
+    crearParrafo('Descripcion', tarea.descripcion, 'tareaDescripcion')
   );
 
   const tareaAcciones = document.createElement('div');
-  tareaAcciones.classList.add('tarea-acciones');
+  tareaAcciones.classList.add('tareaAcciones');
 
   const btnEditar = document.createElement('button');
-  btnEditar.classList.add('btn', 'btn-editar-tarea');
+  btnEditar.classList.add('btn', 'btnEditarTarea');
   btnEditar.setAttribute('data-id', tarea.id);
   btnEditar.textContent = 'Editar';
 
   const btnEliminar = document.createElement('button');
-  btnEliminar.classList.add('btn', 'btn-eliminar-tarea');
+  btnEliminar.classList.add('btn', 'btnEliminarTarea');
   btnEliminar.setAttribute('data-id', tarea.id);
   btnEliminar.textContent = 'Eliminar';
 
