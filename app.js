@@ -1,15 +1,14 @@
-// Importaciones
-import { armarCiudades, armarGenero, armarListaUsuarios, armarListaTareas, armarCardTarea } from "./js/ui/index.js";
+// Importaciones específicas para usuarios
+import { armarCiudades, armarGenero, armarListaUsuarios } from "./js/ui/index.js";
 import { validar } from "./js/utils/validarFormulario.js";
-import { ciudades, generos, getUsuarios, getUsuarioPorDocumento, crearUsuario, actualizarUsuario, eliminarUsuario, getTareas, crearTarea, actualizarTarea, eliminarTarea, getTareasById } from "./js/api/index.js";
+import { ciudades, generos, getUsuarios, getUsuarioPorDocumento, crearUsuario, actualizarUsuario, eliminarUsuario } from "./js/api/index.js";
 
-// variables globales
+// variables globales (solo para usuarios)
 let datosCiudades = [];
 let datosGeneros = [];
 let usuarioEditandoId = null;
-let tareaEditandoId = null;
 
-// referencias DOM
+// referencias DOM (solo para usuarios)
 const formulario = document.querySelector("#formUsuario");
 const documento = document.querySelector("#documento");
 const nombre = document.querySelector("#nombre");
@@ -18,17 +17,9 @@ const divGeneros = document.getElementById("generos");
 const ciudadId = document.querySelector("#ciudadId");
 const btnEnviar = document.querySelector("#btnEnviar");
 const listaUsuarios = document.querySelector("#listaUsuarios");
-
-const buscarDocumento = document.querySelector("#buscarDocumento");
 const btnBuscar = document.querySelector("#btnBuscar");
+const buscarDocumento = document.querySelector("#buscarDocumento");
 const resultadoBusqueda = document.querySelector("#resultadoBusqueda");
-
-const formTarea = document.querySelector("#formTarea");
-const docTarea = document.querySelector("#docTarea");
-const tituloTarea = document.querySelector("#tituloTarea");
-const descripcionTarea = document.querySelector("#descripcionTarea");
-const btnCrearTarea = document.querySelector("#btnCrearTarea");
-const listaTareas = document.querySelector("#listaTareas");
 
 const vistaUsuarios = document.querySelector("#vistaUsuarios");
 // const vistaTareas = document.querySelector("#vistaTareas"); // Ya no necesaria
@@ -68,11 +59,6 @@ const cargarUsuariosEnLista = async () => {
     armarListaUsuarios(listaUsuarios, usuarios, datosCiudades, datosGeneros);
 };
 
-const cargarTareasEnLista = async () => {
-    const tareas = await getTareas();
-    armarListaTareas(listaTareas, tareas);
-};
-
 const cargarFormularioConUsuario = (usuario) => {
     documento.value = usuario.documento;
     nombre.value = usuario.nombre;
@@ -97,7 +83,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     armarGenero(divGeneros, datosGeneros);
     armarCiudades(ciudadId, datosCiudades);
     await cargarUsuariosEnLista();
-    await cargarTareasEnLista();
 });
 
 // Navegacion entre vistas (ya no necesaria con enlaces directos)
@@ -244,137 +229,5 @@ btnBuscar.addEventListener("click", async () => {
         p.classList.add('msgNoEncontrado');
         p.textContent = 'No se encontro ningun usuario con ese documento';
         resultadoBusqueda.append(p);
-    }
-});
-
-// Submit formulario tareas
-formTarea.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const docValor = docTarea.value.trim();
-    const tituloValor = tituloTarea.value.trim();
-    const descValor = descripcionTarea.value.trim();
-
-    docTarea.classList.remove("error");
-    tituloTarea.classList.remove("error");
-    descripcionTarea.classList.remove("error");
-
-    if (docValor === "") {
-        docTarea.classList.add("error");
-        return;
-    }
-
-    if (tituloValor === "") {
-        tituloTarea.classList.add("error");
-        return;
-    }
-
-    if (descValor === "") {
-        descripcionTarea.classList.add("error");
-        return;
-    }
-
-    const resultados = await getUsuarioPorDocumento(docValor);
-
-    if (resultados.length === 0) {
-        docTarea.classList.add("error");
-        const msgExistente = formTarea.querySelector(".msgDocTarea");
-        if (!msgExistente) {
-            const msg = document.createElement("p");
-            msg.classList.add("msgNoEncontrado", "msgDocTarea");
-            msg.textContent = "No existe un usuario con ese documento";
-            docTarea.parentElement.append(msg);
-        }
-        return;
-    }
-
-    const msgAnterior = formTarea.querySelector(".msgDocTarea");
-
-    if (msgAnterior) msgAnterior.remove();
-
-    try {
-        if (tareaEditandoId !== null) {
-            // Al editar no se cambia el usuario, solo titulo y descripcion
-            const tareaActualizada = {
-                titulo: tituloValor,
-                descripcion: descValor,
-                documento_usuario: docValor
-            };
-
-            await actualizarTarea(tareaEditandoId, tareaActualizada);
-
-            const cardTarea = listaTareas.querySelector(`[data-id='${tareaEditandoId}']`);
-            if (cardTarea) {
-                const pDoc = cardTarea.querySelector(".tareaInfo p:first-child");
-                pDoc.replaceChildren();
-                const strong = document.createElement('strong');
-                strong.textContent = 'Documento:';
-                pDoc.append(strong, ` ${docValor}`);
-
-                cardTarea.querySelector(".tareaTitulo").textContent = tituloValor;
-                cardTarea.querySelector(".tareaDescripcion").textContent = descValor;
-            }
-
-            tareaEditandoId = null;
-            btnCrearTarea.textContent = "Crear Tarea";
-        } else {
-            const nuevaTarea = {
-                documento_usuario: docValor,
-                titulo: tituloValor,
-                descripcion: descValor
-            };
-
-            const tareaCreada = await crearTarea(nuevaTarea);
-            const { armarCardTarea: buildCard } = await import("./js/ui/tareas.js");
-            const cardNueva = buildCard(tareaCreada);
-            listaTareas.append(cardNueva);
-        }
-
-        formTarea.reset();
-        docTarea.disabled = false;
-
-    } catch (error) {
-        console.error("Error al guardar tarea:", error);
-        alert(`Hubo un error al guardar la tarea: ${error.message}`);
-    }
-});
-
-// Delegacion de eventos en lista de tareas
-listaTareas.addEventListener("click", async (e) => {
-    const btnEditar = e.target.closest(".btnEditarTarea");
-    if (btnEditar) {
-        const id = btnEditar.getAttribute("data-id");
-        const card = listaTareas.querySelector(`[data-id='${id}']`);
-
-        if (card) {
-            const tituloTexto = card.querySelector(".tareaTitulo").textContent;
-            const descTexto = card.querySelector(".tareaDescripcion").textContent;
-            const docElemento = card.querySelector(".tareaInfo p:first-child");
-            const docTexto = docElemento.textContent.replace("Documento:", "").trim();
-
-            docTarea.value = docTexto;
-            tituloTarea.value = tituloTexto;
-            descripcionTarea.value = descTexto;
-            docTarea.disabled = true;
-
-            tareaEditandoId = id;
-            btnCrearTarea.textContent = "Actualizar Tarea";
-            formTarea.scrollIntoView({ behavior: "smooth" });
-        }
-    }
-
-    const btnEliminar = e.target.closest(".btnEliminarTarea");
-    if (btnEliminar) {
-        const idEliminar = btnEliminar.getAttribute("data-id");
-        if (confirm("¿Está seguro de eliminar esta tarea?")) {
-            try {
-                await eliminarTarea(idEliminar);
-                const cardEliminar = listaTareas.querySelector(`[data-id='${idEliminar}']`);
-                if (cardEliminar) cardEliminar.remove();
-            } catch (error) {
-                console.error("Error al eliminar tarea:", error);
-                alert(`No se pudo eliminar la tarea: ${error.message}`);
-            }
-        }
     }
 });
