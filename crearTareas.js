@@ -2,23 +2,27 @@
 // SCRIPT PARA FORMULARIO DE TAREAS
 // ============================================
 
-// Importaciones específicas para tareas
-import { armarListaTareas, armarCardTarea } from "./js/ui/tareas.js";
-import { getTareas, crearTarea, actualizarTarea, eliminarTarea, getTareasById, getUsuarioPorDocumento } from "./js/api/index.js";
+import { armarListaTareas, armarCardTarea, guardarTareasParaFiltro, inicializarFiltros, obtenerTodasLasTareas } from "./js/ui/tareas.js";
+import { inicializarOrdenamiento } from "./js/ui/ordenamiento.js";
+import { notificarExito, notificarError, notificarInfo } from "./js/ui/notificaciones.js";
+import { exportarTareasJSON } from "./js/ui/exportar.js";
+import { getTareas, crearTarea, actualizarTarea, eliminarTarea, getUsuarioPorDocumento } from "./js/api/index.js";
 
-// Variables globales para tareas
+// Variables globales
 let tareaEditandoId = null;
 
-// Referencias DOM para tareas
+// Referencias DOM
 const formTarea = document.querySelector("#formTarea");
 const docTarea = document.querySelector("#docTarea");
 const tituloTarea = document.querySelector("#tituloTarea");
 const descripcionTarea = document.querySelector("#descripcionTarea");
+const selectEstadoTarea = document.querySelector("#estadoTarea");
 const btnCrearTarea = document.querySelector("#btnCrearTarea");
 const listaTareas = document.querySelector("#listaTareas");
+const btnExportar = document.querySelector("#btnExportar");
 
 // ============================================
-// FUNCIONES AUXILIARES PARA TAREAS
+// FUNCIONES AUXILIARES
 // ============================================
 
 const limpiarFormularioTarea = () => {
@@ -28,52 +32,48 @@ const limpiarFormularioTarea = () => {
     btnCrearTarea.textContent = "Crear Tarea";
 };
 
+const actualizarTareasEnSistema = async () => {
+    const tareas = await getTareas();
+    guardarTareasParaFiltro(tareas);
+};
+
 const cargarTareasEnLista = async () => {
     try {
         const tareas = await getTareas();
-        listaTareas.replaceChildren();
+        guardarTareasParaFiltro(tareas);
         armarListaTareas(listaTareas, tareas);
+        inicializarFiltros(listaTareas);
+        inicializarOrdenamiento(listaTareas, obtenerTodasLasTareas, armarListaTareas);
     } catch (error) {
         console.error("Error al cargar tareas:", error);
+        notificarError("Error al cargar las tareas");
     }
 };
 
 // ============================================
-// EVENT LISTENERS PARA TAREAS
+// SUBMIT FORMULARIO - CREAR O EDITAR TAREA
 // ============================================
 
-// Submit formulario tareas
 formTarea.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const docValor = docTarea.value.trim();
     const tituloValor = tituloTarea.value.trim();
     const descValor = descripcionTarea.value.trim();
+    const estadoValor = selectEstadoTarea ? selectEstadoTarea.value : "pendiente";
 
-    // Limpiar errores
+    // Limpiar errores visuales
     docTarea.classList.remove("error");
     tituloTarea.classList.remove("error");
     descripcionTarea.classList.remove("error");
 
-    // Validaciones básicas
-    if (docValor === "") {
-        docTarea.classList.add("error");
-        return;
-    }
+    // Validaciones
+    if (docValor === "") { docTarea.classList.add("error"); return; }
+    if (tituloValor === "") { tituloTarea.classList.add("error"); return; }
+    if (descValor === "") { descripcionTarea.classList.add("error"); return; }
 
-    if (tituloValor === "") {
-        tituloTarea.classList.add("error");
-        return;
-    }
-
-    if (descValor === "") {
-        descripcionTarea.classList.add("error");
-        return;
-    }
-
-    // Verificar que exista el usuario
+    // Verificar que el usuario exista
     const resultados = await getUsuarioPorDocumento(docValor);
-
     if (resultados.length === 0) {
         docTarea.classList.add("error");
         const msgExistente = formTarea.querySelector(".msgDocTarea");
@@ -83,98 +83,145 @@ formTarea.addEventListener("submit", async (e) => {
             msg.textContent = "No existe un usuario con ese documento";
             docTarea.parentElement.append(msg);
         }
+        notificarError("No existe un usuario con ese documento");
         return;
     }
 
-    // Limpiar mensaje de error si existe
     const msgAnterior = formTarea.querySelector(".msgDocTarea");
     if (msgAnterior) msgAnterior.remove();
 
     try {
         if (tareaEditandoId !== null) {
-            // Actualizar tarea existente
+            // ---- EDITAR ----
             const tareaActualizada = {
                 titulo: tituloValor,
                 descripcion: descValor,
-                documento_usuario: docValor
+                documento_usuario: docValor,
+                estado: estadoValor
             };
 
             await actualizarTarea(tareaEditandoId, tareaActualizada);
 
-            const cardTarea = listaTareas.querySelector(`[data-id='${tareaEditandoId}']`);
+            const selector = "[data-id='" + tareaEditandoId + "']";
+            const cardTarea = listaTareas.querySelector(selector);
             if (cardTarea) {
                 const pDoc = cardTarea.querySelector(".tareaInfo p:first-child");
                 pDoc.replaceChildren();
-                const strong = document.createElement('strong');
-                strong.textContent = 'Documento:';
-                pDoc.append(strong, ` ${docValor}`);
-
+                const strong = document.createElement("strong");
+                strong.textContent = "Documento:";
+                pDoc.append(strong, " " + docValor);
                 cardTarea.querySelector(".tareaTitulo").textContent = tituloValor;
                 cardTarea.querySelector(".tareaDescripcion").textContent = descValor;
+                const spanEstado = cardTarea.querySelector(".tareaEstado");
+                if (spanEstado) {
+                    spanEstado.className = "tareaEstado tareaEstado--" + estadoValor.replace(" ", "-");
+                    spanEstado.textContent = estadoValor;
+                }
             }
 
+            await actualizarTareasEnSistema();
             tareaEditandoId = null;
             btnCrearTarea.textContent = "Crear Tarea";
+            notificarExito("Tarea actualizada correctamente");
+
         } else {
-            // Crear nueva tarea
+            // ---- CREAR ----
             const nuevaTarea = {
                 documento_usuario: docValor,
                 titulo: tituloValor,
-                descripcion: descValor
+                descripcion: descValor,
+                estado: estadoValor
             };
 
             const tareaCreada = await crearTarea(nuevaTarea);
+
+            const msgVacio = listaTareas.querySelector(".msgNoTareas");
+            if (msgVacio) msgVacio.remove();
+
             const cardNueva = armarCardTarea(tareaCreada);
             listaTareas.append(cardNueva);
+
+            await actualizarTareasEnSistema();
+            notificarExito("Tarea creada correctamente");
         }
 
         limpiarFormularioTarea();
 
     } catch (error) {
         console.error("Error al guardar tarea:", error);
-        alert(`Hubo un error al guardar la tarea: ${error.message}`);
+        notificarError("Hubo un error al guardar la tarea: " + error.message);
     }
 });
 
-// Delegacion de eventos en lista de tareas
+// ============================================
+// DELEGACION DE EVENTOS - EDITAR / ELIMINAR
+// ============================================
+
 listaTareas.addEventListener("click", async (e) => {
+
+    // ---- EDITAR ----
     const btnEditar = e.target.closest(".btnEditarTarea");
     if (btnEditar) {
         const id = btnEditar.getAttribute("data-id");
-        const card = listaTareas.querySelector(`[data-id='${id}']`);
+        const card = listaTareas.querySelector("[data-id='" + id + "']");
 
         if (card) {
-            const tituloTexto = card.querySelector(".tareaTitulo").textContent;
-            const descTexto = card.querySelector(".tareaDescripcion").textContent;
-            const docElemento = card.querySelector(".tareaInfo p:first-child");
-            const docTexto = docElemento.textContent.replace("Documento:", "").trim();
-
-            docTarea.value = docTexto;
-            tituloTarea.value = tituloTexto;
-            descripcionTarea.value = descTexto;
+            docTarea.value = card.querySelector(".tareaInfo p:first-child").textContent.replace("Documento:", "").trim();
+            tituloTarea.value = card.querySelector(".tareaTitulo").textContent;
+            descripcionTarea.value = card.querySelector(".tareaDescripcion").textContent;
+            const spanEstado = card.querySelector(".tareaEstado");
+            if (selectEstadoTarea && spanEstado) selectEstadoTarea.value = spanEstado.textContent;
             docTarea.disabled = true;
-
             tareaEditandoId = id;
             btnCrearTarea.textContent = "Actualizar Tarea";
             formTarea.scrollIntoView({ behavior: "smooth" });
         }
     }
 
+    // ---- ELIMINAR ----
     const btnEliminar = e.target.closest(".btnEliminarTarea");
     if (btnEliminar) {
         const idEliminar = btnEliminar.getAttribute("data-id");
         if (confirm("¿Está seguro de eliminar esta tarea?")) {
             try {
                 await eliminarTarea(idEliminar);
-                const cardEliminar = listaTareas.querySelector(`[data-id='${idEliminar}']`);
+                const cardEliminar = listaTareas.querySelector("[data-id='" + idEliminar + "']");
                 if (cardEliminar) cardEliminar.remove();
+
+                const cardsRestantes = listaTareas.querySelectorAll(".cardTarea");
+                if (cardsRestantes.length === 0) {
+                    const msg = document.createElement("p");
+                    msg.classList.add("msgNoTareas");
+                    msg.textContent = "No hay tareas para mostrar.";
+                    listaTareas.append(msg);
+                }
+
+                await actualizarTareasEnSistema();
+                notificarExito("Tarea eliminada correctamente");
+
             } catch (error) {
                 console.error("Error al eliminar tarea:", error);
-                alert(`No se pudo eliminar la tarea: ${error.message}`);
+                notificarError("No se pudo eliminar la tarea: " + error.message);
             }
         }
     }
 });
+
+// ============================================
+// EXPORTAR - RF04
+// ============================================
+
+if (btnExportar) {
+    btnExportar.addEventListener("click", () => {
+        const tareas = obtenerTodasLasTareas();
+        const exportado = exportarTareasJSON(tareas);
+        if (exportado) {
+            notificarExito("Tareas exportadas correctamente");
+        } else {
+            notificarInfo("No hay tareas para exportar");
+        }
+    });
+}
 
 // ============================================
 // INICIALIZACIÓN
