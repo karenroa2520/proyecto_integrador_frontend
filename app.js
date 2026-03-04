@@ -21,11 +21,6 @@ const btnBuscar = document.querySelector("#btnBuscar");
 const buscarDocumento = document.querySelector("#buscarDocumento");
 const resultadoBusqueda = document.querySelector("#resultadoBusqueda");
 
-const vistaUsuarios = document.querySelector("#vistaUsuarios");
-// const vistaTareas = document.querySelector("#vistaTareas"); // Ya no necesaria
-// const btnIrTareas = document.querySelector("#btnIrTareas"); // Ya no necesaria
-// const btnIrUsuarios = document.querySelector("#btnIrUsuarios"); // Ya no necesaria
-
 const reglas = {
     documento: { required: true, min: 8, max: 10, mensaje: "El campo es obligatorio" },
     nombre: { required: true, mensaje: "El campo es obligatorio" },
@@ -85,17 +80,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     await cargarUsuariosEnLista();
 });
 
-// Navegacion entre vistas (ya no necesaria con enlaces directos)
-// btnIrTareas.addEventListener("click", () => {
-//     vistaUsuarios.classList.add("oculto");
-//     vistaTareas.classList.remove("oculto");
-// });
-//
-// btnIrUsuarios.addEventListener("click", () => {
-//     vistaTareas.classList.add("oculto");
-//     vistaUsuarios.classList.remove("oculto");
-// });
-
 // Submit formulario usuario (crear o actualizar)
 formulario.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -126,8 +110,8 @@ formulario.addEventListener("submit", async (e) => {
         if (usuarioEditandoId !== null) {
             await actualizarUsuario(usuarioEditandoId, datosUsuario);
 
-            // Actualizar card existente sin recargar ni crear nueva
-            const cardExistente = listaUsuarios.querySelector(`[data-id='${usuarioEditandoId}']`);
+            const selectorCard = "[data-id='" + usuarioEditandoId + "']";
+            const cardExistente = listaUsuarios.querySelector(selectorCard);
             if (cardExistente) {
                 const ciudad = datosCiudades.find(c => c.id == datosUsuario.ciudad_id);
                 const genero = datosGeneros.find(g => g.id == datosUsuario.genero_id);
@@ -136,24 +120,23 @@ formulario.addEventListener("submit", async (e) => {
                 cardInfo.replaceChildren();
 
                 const crearParrafo = (label, valor) => {
-                    const p = document.createElement('p');
-                    const strong = document.createElement('strong');
-                    strong.textContent = `${label}:`;
-                    p.append(strong, ` ${valor || ''}`);
+                    const p = document.createElement("p");
+                    const strong = document.createElement("strong");
+                    strong.textContent = label + ":";
+                    p.append(strong, " " + (valor || ""));
                     return p;
                 };
 
                 cardInfo.append(
-                    crearParrafo('Documento', datosUsuario.documento),
-                    crearParrafo('Nombre', datosUsuario.nombre),
-                    crearParrafo('Genero', genero ? genero.genero : ''),
-                    crearParrafo('Ciudad', ciudad ? ciudad.ciudad : ''),
-                    crearParrafo('Correo', datosUsuario.correo)
+                    crearParrafo("Documento", datosUsuario.documento),
+                    crearParrafo("Nombre", datosUsuario.nombre),
+                    crearParrafo("Genero", genero ? genero.genero : ""),
+                    crearParrafo("Ciudad", ciudad ? ciudad.ciudad : ""),
+                    crearParrafo("Correo", datosUsuario.correo)
                 );
             }
         } else {
             const nuevoUsuario = await crearUsuario(datosUsuario);
-            // Agregar la nueva card dinamicamente
             const { armarCardUsuario } = await import("./js/ui/usuarios.js");
             const card = armarCardUsuario(nuevoUsuario, datosCiudades, datosGeneros);
             listaUsuarios.append(card);
@@ -181,20 +164,18 @@ listaUsuarios.addEventListener("click", async (e) => {
     }
 
     const btnEliminar = e.target.closest(".btnEliminarUsuario");
-
     if (btnEliminar) {
-
         const idEliminar = btnEliminar.getAttribute("data-id");
 
         if (confirm("¿Está seguro de eliminar este usuario?")) {
             try {
                 await eliminarUsuario(idEliminar);
-                const card = listaUsuarios.querySelector(`[data-id='${idEliminar}']`);
-
+                const selectorEliminar = "[data-id='" + idEliminar + "']";
+                const card = listaUsuarios.querySelector(selectorEliminar);
                 if (card) card.remove();
             } catch (error) {
                 console.error("Error al eliminar usuario:", error);
-                alert(`No se pudo eliminar el usuario: ${error.message}`);
+                alert("No se pudo eliminar el usuario: " + error.message);
             }
         }
     }
@@ -205,11 +186,10 @@ btnBuscar.addEventListener("click", async () => {
     const docValor = buscarDocumento.value.trim();
     resultadoBusqueda.replaceChildren();
 
-
     if (docValor === "") {
-        const p = document.createElement('p');
-        p.classList.add('msgError');
-        p.textContent = 'Por favor ingrese un documento';
+        const p = document.createElement("p");
+        p.classList.add("msgError");
+        p.textContent = "Por favor ingrese un documento";
         resultadoBusqueda.append(p);
         return;
     }
@@ -218,16 +198,16 @@ btnBuscar.addEventListener("click", async () => {
 
     if (resultados.length > 0) {
         const u = resultados[0];
-        const p = document.createElement('p');
-        p.classList.add('msgEncontrado');
-        const strong = document.createElement('strong');
+        const p = document.createElement("p");
+        p.classList.add("msgEncontrado");
+        const strong = document.createElement("strong");
         strong.textContent = u.nombre;
-        p.append('Usuario encontrado: ', strong, ` - Documento: ${u.documento} - Correo: ${u.correo}`);
+        p.append("Usuario encontrado: ", strong, " - Documento: " + u.documento + " - Correo: " + u.correo);
         resultadoBusqueda.append(p);
     } else {
-        const p = document.createElement('p');
-        p.classList.add('msgNoEncontrado');
-        p.textContent = 'No se encontro ningun usuario con ese documento';
+        const p = document.createElement("p");
+        p.classList.add("msgNoEncontrado");
+        p.textContent = "No se encontro ningun usuario con ese documento";
         resultadoBusqueda.append(p);
     }
 });
