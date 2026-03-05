@@ -1,2 +1,1 @@
-export { procesarTareasParaExportar, ordenarTareas, inicializarOrdenamiento } from './tareasService';
-export { };
+export { procesarTareasParaExportar, ordenarTareas, inicializarOrdenamiento, filtrarTareas } from './tareasService';

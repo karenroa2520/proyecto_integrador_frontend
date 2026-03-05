@@ -51,6 +51,23 @@ export const ordenarTareas = (tareas, criterio) => {
     return copia;
 };
 
+export const filtrarTareas = (tareas, criterios) => {
+    const { documento, estado, usuario } = criterios;
+    
+    return tareas.filter(tarea => {
+        const cumpleDocumento = !documento || 
+            (tarea.documento_usuario && tarea.documento_usuario.toLowerCase().includes(documento));
+        
+        const cumpleEstado = !estado || 
+            (tarea.estado && tarea.estado === estado);
+            
+        const cumpleUsuario = !usuario || 
+            (tarea.documento_usuario && tarea.documento_usuario.toLowerCase().includes(usuario));
+            
+        return cumpleDocumento && cumpleEstado && cumpleUsuario;
+    });
+};
+
 export const inicializarOrdenamiento = (contenedor, obtenerTareas, renderizar) => {
     const selectOrden = document.getElementById("selectOrden");
     if (!selectOrden) return;

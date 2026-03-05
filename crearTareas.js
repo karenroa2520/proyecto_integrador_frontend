@@ -3,11 +3,10 @@
 // ============================================
 
 import { armarListaTareas, armarCardTarea, guardarTareasParaFiltro, inicializarFiltros, obtenerTodasLasTareas } from "./js/ui/tareas.js";
-import { inicializarOrdenamiento } from "./js/ui/ordenamiento.js";
 import { notificarExito, notificarError, notificarInfo } from "./js/ui/notificaciones.js";
 import { exportarTareasJSON } from "./js/ui/exportar.js";
 import { getTareas, crearTarea, actualizarTarea, eliminarTarea, getUsuarioPorDocumento } from "./js/api/index.js";
-import { procesarTareasParaExportar } from "./js/services/index.js";
+import { procesarTareasParaExportar, inicializarOrdenamiento } from "./js/services/index.js";
 
 // Variables globales
 let tareaEditandoId = null;

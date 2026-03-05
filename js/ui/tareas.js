@@ -2,6 +2,8 @@
 // UI DE TAREAS
 // ============================================
 
+import { filtrarTareas } from "../services/tareasService.js";
+
 export const armarCardTarea = (tarea) => {
     const card = document.createElement("div");
     card.classList.add("cardTarea");
@@ -96,17 +98,13 @@ export const guardarTareasParaFiltro = (tareas) => {
 export const obtenerTodasLasTareas = () => todasLasTareas;
 
 const aplicarFiltros = (contenedor) => {
-    const filtroDocumento = document.getElementById("filtroDocumento").value.trim().toLowerCase();
-    const filtroEstado = document.getElementById("filtroEstado").value;
-    const filtroUsuario = document.getElementById("filtroUsuario").value.trim().toLowerCase();
+    const criterios = {
+        documento: document.getElementById("filtroDocumento").value.trim().toLowerCase(),
+        estado: document.getElementById("filtroEstado").value,
+        usuario: document.getElementById("filtroUsuario").value.trim().toLowerCase()
+    };
 
-    const tareasFiltradas = todasLasTareas.filter(tarea => {
-        const cumpleDocumento = !filtroDocumento || (tarea.documento_usuario && tarea.documento_usuario.toLowerCase().includes(filtroDocumento));
-        const cumpleEstado = !filtroEstado || (tarea.estado && tarea.estado === filtroEstado);
-        const cumpleUsuario = !filtroUsuario || (tarea.documento_usuario && tarea.documento_usuario.toLowerCase().includes(filtroUsuario));
-        return cumpleDocumento && cumpleEstado && cumpleUsuario;
-    });
-
+    const tareasFiltradas = filtrarTareas(todasLasTareas, criterios);
     armarListaTareas(contenedor, tareasFiltradas);
 };
 
