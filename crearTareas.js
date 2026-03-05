@@ -149,7 +149,28 @@ formTarea.addEventListener("submit", async (e) => {
 
     } catch (error) {
         console.error("Error al guardar tarea:", error);
-        notificarError("Hubo un error al guardar la tarea: " + error.message);
+        console.error("Detalles del error:", {
+            message: error.message,
+            stack: error.stack,
+            tipoOperacion: tareaEditandoId !== null ? "EDITAR" : "CREAR",
+            datos: {
+                documento: docValor,
+                titulo: tituloValor,
+                descripcion: descValor,
+                estado: estadoValor
+            }
+        });
+        
+        // Mostrar error más específico al usuario
+        if (error.message.includes("CORS") || error.message.includes("fetch")) {
+            notificarError("Error de conexión: Verifica que el servidor backend esté corriendo en http://localhost:3000");
+        } else if (error.message.includes("404")) {
+            notificarError("Error: El servidor no encontró el recurso. Verifica la configuración del backend.");
+        } else if (error.message.includes("500")) {
+            notificarError("Error interno del servidor. Intenta nuevamente.");
+        } else {
+            notificarError("Hubo un error al guardar la tarea: " + error.message);
+        }
     }
 });
 
