@@ -79,6 +79,20 @@
       "documento_usuario": "1097912219",
       "titulo": "probando",
       "descripcion": "hola hola"
+    },
+    {
+      "id": "d305",
+      "documento_usuario": "123456789",
+      "titulo": "test",
+      "descripcion": "test desc",
+      "estado": "pendiente"
+    },
+    {
+      "id": 6,
+      "documento_usuario": "1097912218",
+      "titulo": "trabajar",
+      "descripcion": "trabajar en el proyecto",
+      "estado": "en proceso"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
